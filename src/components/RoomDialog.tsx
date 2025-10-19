@@ -114,7 +114,7 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomD
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="room_number">Room Number *</Label>
+              <Label htmlFor="room_number">Oda Numarası *</Label>
               <Input
                 id="room_number"
                 required
@@ -124,7 +124,7 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomD
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="floor">Floor *</Label>
+              <Label htmlFor="floor">Kat *</Label>
               <Input
                 id="floor"
                 type="number"
@@ -138,7 +138,7 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomD
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="room_type">Room Type *</Label>
+              <Label htmlFor="room_type">Oda Tipi *</Label>
               <Select
                 value={formData.room_type}
                 onValueChange={(value) => setFormData({ ...formData, room_type: value })}
@@ -147,16 +147,16 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomD
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="single">Single</SelectItem>
-                  <SelectItem value="double">Double</SelectItem>
-                  <SelectItem value="suite">Suite</SelectItem>
+                  <SelectItem value="single">Tek Kişilik</SelectItem>
+                  <SelectItem value="double">Çift Kişilik</SelectItem>
+                  <SelectItem value="suite">Suit</SelectItem>
                   <SelectItem value="deluxe">Deluxe</SelectItem>
                   <SelectItem value="presidential">Presidential</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="status">Status *</Label>
+              <Label htmlFor="status">Durum *</Label>
               <Select
                 value={formData.status}
                 onValueChange={(value) => setFormData({ ...formData, status: value })}
@@ -165,11 +165,11 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomD
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="available">Available</SelectItem>
-                  <SelectItem value="occupied">Occupied</SelectItem>
-                  <SelectItem value="cleaning">Cleaning</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
-                  <SelectItem value="reserved">Reserved</SelectItem>
+                  <SelectItem value="available">Müsait</SelectItem>
+                  <SelectItem value="occupied">Dolu</SelectItem>
+                  <SelectItem value="cleaning">Temizlikte</SelectItem>
+                  <SelectItem value="maintenance">Bakımda</SelectItem>
+                  <SelectItem value="reserved">Rezerve</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -177,7 +177,7 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomD
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="max_occupancy">Max Occupancy *</Label>
+              <Label htmlFor="max_occupancy">Maksimum Kapasite *</Label>
               <Input
                 id="max_occupancy"
                 type="number"
@@ -188,7 +188,7 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomD
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="rate_per_night">Rate per Night ($) *</Label>
+              <Label htmlFor="rate_per_night">Gecelik Ücret (₺) *</Label>
               <Input
                 id="rate_per_night"
                 type="number"
@@ -197,28 +197,28 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomD
                 min="0"
                 value={formData.rate_per_night}
                 onChange={(e) => setFormData({ ...formData, rate_per_night: e.target.value })}
-                placeholder="99.99"
+                placeholder="3500"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amenities">Amenities (comma-separated)</Label>
+            <Label htmlFor="amenities">Olanaklar (virgülle ayırın)</Label>
             <Input
               id="amenities"
               value={formData.amenities}
               onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
-              placeholder="WiFi, TV, AC, Mini Bar"
+              placeholder="WiFi, TV, Klima, Mini Bar"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Açıklama</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Room description..."
+              placeholder="Oda açıklaması..."
               rows={3}
             />
           </div>

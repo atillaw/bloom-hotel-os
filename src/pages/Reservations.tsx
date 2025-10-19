@@ -3,15 +3,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Calendar, User, BedDouble, Clock, LogIn, CreditCard } from "lucide-react";
+import { Plus, Calendar, User, BedDouble, Clock, LogIn, CreditCard, Edit, X } from "lucide-react";
 import { useState } from "react";
 import { ReservationDialog } from "@/components/ReservationDialog";
 import { CheckInDialog } from "@/components/CheckInDialog";
+import { CancelReservationDialog } from "@/components/CancelReservationDialog";
 import { format } from "date-fns";
 
 const Reservations = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [checkInReservation, setCheckInReservation] = useState<any>(null);
+  const [editingReservation, setEditingReservation] = useState<any>(null);
+  const [cancelReservation, setCancelReservation] = useState<any>(null);
 
   const { data: reservations, refetch } = useQuery({
     queryKey: ["reservations-full"],
@@ -46,12 +49,12 @@ const Reservations = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold">Reservation Management</h2>
-          <p className="text-muted-foreground">Manage bookings and reservations</p>
+          <h2 className="text-3xl font-bold">Rezervasyon Yönetimi</h2>
+          <p className="text-muted-foreground">Rezervasyonları yönetin</p>
         </div>
         <Button onClick={() => setIsDialogOpen(true)} className="shadow-ocean">
           <Plus className="w-4 h-4 mr-2" />
-          New Reservation
+          Yeni Rezervasyon
         </Button>
       </div>
 
@@ -66,18 +69,19 @@ const Reservations = () => {
                       Reservation #{reservation.id.slice(0, 8).toUpperCase()}
                     </h3>
                     <Badge className={getStatusColor(reservation.status)}>
-                      {reservation.status.replace("_", " ")}
+                      {reservation.status === "pending" ? "Beklemede" :
+                       reservation.status === "confirmed" ? "Onaylandı" :
+                       reservation.status === "checked_in" ? "Check-in" :
+                       reservation.status === "checked_out" ? "Check-out" :
+                       reservation.status === "cancelled" ? "İptal" : "Gelmedi"}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Created {format(new Date(reservation.created_at), "MMM dd, yyyy")}
-                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-primary">
-                    ${reservation.total_amount}
+                    ₺{(parseFloat(String(reservation.total_amount)) * 35).toFixed(2)}
                   </p>
-                  <p className="text-xs text-muted-foreground">Total Amount</p>
+                  <p className="text-xs text-muted-foreground">Toplam Tutar</p>
                 </div>
               </div>
 
@@ -85,7 +89,7 @@ const Reservations = () => {
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                   <User className="w-5 h-5 text-primary mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Guest</p>
+                    <p className="text-xs text-muted-foreground mb-1">Misafir</p>
                     <p className="font-medium">
                       {reservation.guests?.first_name} {reservation.guests?.last_name}
                     </p>
@@ -109,12 +113,12 @@ const Reservations = () => {
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                   <Clock className="w-5 h-5 text-primary mt-0.5" />
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Duration</p>
+                    <p className="text-xs text-muted-foreground mb-1">Süre</p>
                     <p className="font-medium">
-                      {format(new Date(reservation.check_in_date), "MMM dd")} - {format(new Date(reservation.check_out_date), "MMM dd, yyyy")}
+                      {format(new Date(reservation.check_in_date), "dd MMM")} - {format(new Date(reservation.check_out_date), "dd MMM yyyy")}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {reservation.number_of_guests} guest(s)
+                      {reservation.number_of_guests} misafir
                     </p>
                   </div>
                 </div>
@@ -122,7 +126,7 @@ const Reservations = () => {
 
               {reservation.special_requests && (
                 <div className="mt-4 p-3 rounded-lg bg-secondary/5 border border-secondary/20">
-                  <p className="text-xs text-muted-foreground mb-1">Special Requests</p>
+                  <p className="text-xs text-muted-foreground mb-1">Özel İstekler</p>
                   <p className="text-sm">{reservation.special_requests}</p>
                 </div>
               )}
@@ -170,7 +174,26 @@ const Reservations = () => {
               )}
 
               {(reservation.status === "confirmed" || reservation.status === "pending") && (
-                <div className="mt-4">
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setEditingReservation(reservation)}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Düzenle
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setCancelReservation(reservation)}
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    İptal
+                  </Button>
+                </div>
+              )}
+
+              {(reservation.status === "confirmed" || reservation.status === "pending") && (
+                <div className="mt-3">
                   <Button
                     className="w-full"
                     onClick={() => setCheckInReservation(reservation)}
@@ -188,21 +211,35 @@ const Reservations = () => {
       {(!reservations || reservations.length === 0) && (
         <Card className="p-12 text-center">
           <Calendar className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No reservations yet</h3>
-          <p className="text-muted-foreground mb-4">Start by creating your first reservation</p>
+          <h3 className="text-xl font-semibold mb-2">Henüz rezervasyon yok</h3>
+          <p className="text-muted-foreground mb-4">İlk rezervasyonunuzu oluşturun</p>
           <Button onClick={() => setIsDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
-            New Reservation
+            Yeni Rezervasyon
           </Button>
         </Card>
       )}
 
-      <ReservationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onSuccess={refetch} />
+      <ReservationDialog 
+        open={isDialogOpen || !!editingReservation} 
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) setEditingReservation(null);
+        }}
+        onSuccess={refetch}
+        editingReservation={editingReservation}
+      />
       <CheckInDialog
         open={!!checkInReservation}
         onOpenChange={(open) => !open && setCheckInReservation(null)}
         onSuccess={refetch}
         reservation={checkInReservation}
+      />
+      <CancelReservationDialog
+        open={!!cancelReservation}
+        onOpenChange={(open) => !open && setCancelReservation(null)}
+        onSuccess={refetch}
+        reservation={cancelReservation}
       />
     </div>
   );

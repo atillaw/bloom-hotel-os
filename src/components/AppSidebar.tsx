@@ -13,11 +13,11 @@ import {
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Rooms", url: "/rooms", icon: BedDouble },
-  { title: "Guests", url: "/guests", icon: Users },
-  { title: "Reservations", url: "/reservations", icon: Calendar },
-  { title: "Billing", url: "/billing", icon: DollarSign },
-  { title: "Housekeeping", url: "/housekeeping", icon: ClipboardList },
+  { title: "Odalar", url: "/rooms", icon: BedDouble },
+  { title: "Misafirler", url: "/guests", icon: Users },
+  { title: "Rezervasyonlar", url: "/reservations", icon: Calendar },
+  { title: "Faturalama", url: "/billing", icon: DollarSign },
+  { title: "Kat Hizmetleri", url: "/housekeeping", icon: ClipboardList },
 ];
 
 export function AppSidebar() {
@@ -25,7 +25,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-primary font-semibold">Management</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-sidebar-primary font-semibold">Yönetim</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (

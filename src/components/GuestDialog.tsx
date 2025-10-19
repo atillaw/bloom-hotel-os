@@ -44,7 +44,7 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
 
       if (error) throw error;
 
-      toast.success("Guest added successfully!");
+      toast.success("Misafir eklendi!");
       onSuccess();
       onOpenChange(false);
       setFormData({
@@ -58,7 +58,7 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
         loyalty_points: "0",
       });
     } catch (error: any) {
-      toast.error(error.message || "Failed to add guest");
+      toast.error(error.message || "Misafir eklenemedi");
     } finally {
       setLoading(false);
     }
@@ -68,12 +68,12 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Guest</DialogTitle>
+          <DialogTitle>Yeni Misafir Ekle</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="first_name">First Name *</Label>
+              <Label htmlFor="first_name">Ad *</Label>
               <Input
                 id="first_name"
                 required
@@ -82,7 +82,7 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="last_name">Last Name *</Label>
+              <Label htmlFor="last_name">Soyad *</Label>
               <Input
                 id="last_name"
                 required
@@ -94,49 +94,49 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-posta</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="guest@example.com"
+                placeholder="misafir@example.com"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">Telefon</Label>
               <Input
                 id="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+1-555-0100"
+                placeholder="+90-555-0100"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nationality">Nationality</Label>
+              <Label htmlFor="nationality">Milliyet</Label>
               <Input
                 id="nationality"
                 value={formData.nationality}
                 onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
-                placeholder="USA"
+                placeholder="Türkiye"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="id_number">ID Number</Label>
+              <Label htmlFor="id_number">Kimlik/Pasaport No</Label>
               <Input
                 id="id_number"
                 value={formData.id_number}
                 onChange={(e) => setFormData({ ...formData, id_number: e.target.value })}
-                placeholder="ID/Passport number"
+                placeholder="Kimlik veya pasaport numarası"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="loyalty_points">Initial Loyalty Points</Label>
+            <Label htmlFor="loyalty_points">Başlangıç Sadakat Puanı</Label>
             <Input
               id="loyalty_points"
               type="number"
@@ -147,22 +147,22 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="preferences">Preferences</Label>
+            <Label htmlFor="preferences">Tercihler</Label>
             <Textarea
               id="preferences"
               value={formData.preferences}
               onChange={(e) => setFormData({ ...formData, preferences: e.target.value })}
-              placeholder="Guest preferences and special requests..."
+              placeholder="Misafir tercihleri ve özel istekler..."
               rows={3}
             />
           </div>
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              İptal
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Guest"}
+              {loading ? "Ekleniyor..." : "Misafir Ekle"}
             </Button>
           </div>
         </form>

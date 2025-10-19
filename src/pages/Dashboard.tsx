@@ -42,36 +42,36 @@ const Dashboard = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h2 className="text-3xl font-bold">Dashboard Overview</h2>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
+        <h2 className="text-3xl font-bold">Dashboard Genel Bakış</h2>
+        <p className="text-muted-foreground">Hoş geldiniz! İşte bugünün özeti.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Rooms"
+          title="Toplam Oda"
           value={totalRooms}
           icon={BedDouble}
-          trend={`${availableRooms} available`}
+          trend={`${availableRooms} müsait`}
           trendUp={availableRooms > 0}
         />
         <StatCard
-          title="Occupancy Rate"
-          value={`${occupancyRate}%`}
+          title="Doluluk Oranı"
+          value={`%${occupancyRate}`}
           icon={TrendingUp}
-          trend={`${occupiedRooms}/${totalRooms} occupied`}
+          trend={`${occupiedRooms}/${totalRooms} dolu`}
           trendUp={occupancyRate > 70}
         />
         <StatCard
-          title="Active Guests"
+          title="Aktif Misafir"
           value={guests?.length || 0}
           icon={Users}
-          trend="Total registered"
+          trend="Toplam kayıtlı"
         />
         <StatCard
-          title="Total Revenue"
-          value={`$${totalRevenue.toFixed(2)}`}
+          title="Toplam Gelir"
+          value={`₺${(totalRevenue * 35).toFixed(2)}`}
           icon={DollarSign}
-          trend={`${activeReservations} active bookings`}
+          trend={`${activeReservations} aktif rezervasyon`}
           trendUp={true}
         />
       </div>
@@ -81,7 +81,7 @@ const Dashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
-              Recent Reservations
+              Son Rezervasyonlar
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -106,7 +106,7 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-center py-8">No reservations yet</p>
+              <p className="text-muted-foreground text-center py-8">Henüz rezervasyon yok</p>
             )}
           </CardContent>
         </Card>
@@ -115,7 +115,7 @@ const Dashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-primary" />
-              Room Status
+              Oda Durumu
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -124,8 +124,8 @@ const Dashboard = () => {
                 {rooms.slice(0, 5).map((room) => (
                   <div key={room.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                     <div>
-                      <p className="font-medium">Room {room.room_number}</p>
-                      <p className="text-sm text-muted-foreground capitalize">{room.room_type} • Floor {room.floor}</p>
+                      <p className="font-medium">Oda {room.room_number}</p>
+                      <p className="text-sm text-muted-foreground capitalize">{room.room_type} • Kat {room.floor}</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       room.status === "available" ? "bg-success/10 text-success" :
@@ -133,13 +133,16 @@ const Dashboard = () => {
                       room.status === "cleaning" ? "bg-secondary/10 text-secondary-foreground" :
                       "bg-muted text-muted-foreground"
                     }`}>
-                      {room.status}
+                      {room.status === "available" ? "Müsait" :
+                       room.status === "occupied" ? "Dolu" :
+                       room.status === "cleaning" ? "Temizlikte" :
+                       room.status === "maintenance" ? "Bakımda" : "Rezerve"}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground text-center py-8">No rooms configured</p>
+              <p className="text-muted-foreground text-center py-8">Oda kaydı yok</p>
             )}
           </CardContent>
         </Card>

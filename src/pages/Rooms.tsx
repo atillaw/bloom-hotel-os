@@ -44,12 +44,12 @@ const Rooms = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold">Room Management</h2>
-          <p className="text-muted-foreground">Manage your hotel rooms and their availability</p>
+          <h2 className="text-3xl font-bold">Oda Yönetimi</h2>
+          <p className="text-muted-foreground">Otel odalarınızı ve müsaitlik durumlarını yönetin</p>
         </div>
         <Button onClick={() => setIsDialogOpen(true)} className="shadow-ocean">
           <Plus className="w-4 h-4 mr-2" />
-          Add Room
+          Oda Ekle
         </Button>
       </div>
 
@@ -61,11 +61,16 @@ const Rooms = () => {
                 <div>
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <BedDouble className="w-5 h-5 text-primary" />
-                    Room {room.room_number}
+                    Oda {room.room_number}
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">Floor {room.floor}</p>
+                  <p className="text-sm text-muted-foreground mt-1">Kat {room.floor}</p>
                 </div>
-                <Badge className={getStatusColor(room.status)}>{room.status}</Badge>
+                <Badge className={getStatusColor(room.status)}>
+                  {room.status === "available" ? "Müsait" :
+                   room.status === "occupied" ? "Dolu" :
+                   room.status === "cleaning" ? "Temizlikte" :
+                   room.status === "maintenance" ? "Bakımda" : "Rezerve"}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -78,11 +83,11 @@ const Rooms = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2 text-muted-foreground">
                   <Users className="w-4 h-4" />
-                  Max {room.max_occupancy} guests
+                  Maks {room.max_occupancy} kişi
                 </span>
                 <span className="flex items-center gap-2 font-semibold text-primary">
                   <DollarSign className="w-4 h-4" />
-                  ${room.rate_per_night}/night
+                  ₺{(parseFloat(String(room.rate_per_night)) * 35).toFixed(0)}/gece
                 </span>
               </div>
 
@@ -125,11 +130,11 @@ const Rooms = () => {
       {(!rooms || rooms.length === 0) && (
         <Card className="p-12 text-center">
           <BedDouble className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No rooms yet</h3>
-          <p className="text-muted-foreground mb-4">Start by adding your first room</p>
+          <h3 className="text-xl font-semibold mb-2">Henüz oda yok</h3>
+          <p className="text-muted-foreground mb-4">İlk odanızı ekleyerek başlayın</p>
           <Button onClick={() => setIsDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
-            Add Room
+            Oda Ekle
           </Button>
         </Card>
       )}

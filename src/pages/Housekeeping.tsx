@@ -5,19 +5,19 @@ const Housekeeping = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold">Housekeeping Management</h2>
-        <p className="text-muted-foreground">Track cleaning schedules and maintenance</p>
+        <h2 className="text-3xl font-bold">Kat Hizmetleri Yönetimi</h2>
+        <p className="text-muted-foreground">Temizlik programlarını ve bakımları takip edin</p>
       </div>
 
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="w-5 h-5 text-primary" />
-            Housekeeping System
+            Kat Hizmetleri Sistemi
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Coming soon - Housekeeping task management</p>
+          <p className="text-muted-foreground">Yakında - Görev yönetimi özellikleri</p>
         </CardContent>
       </Card>
     </div>
