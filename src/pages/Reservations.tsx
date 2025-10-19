@@ -3,13 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Calendar, User, BedDouble, Clock } from "lucide-react";
+import { Plus, Calendar, User, BedDouble, Clock, LogIn, CreditCard } from "lucide-react";
 import { useState } from "react";
 import { ReservationDialog } from "@/components/ReservationDialog";
+import { CheckInDialog } from "@/components/CheckInDialog";
 import { format } from "date-fns";
 
 const Reservations = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [checkInReservation, setCheckInReservation] = useState<any>(null);
 
   const { data: reservations, refetch } = useQuery({
     queryKey: ["reservations-full"],
@@ -19,7 +21,8 @@ const Reservations = () => {
         .select(`
           *,
           guests (*),
-          rooms (*)
+          rooms (*),
+          payments (*)
         `)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -123,6 +126,60 @@ const Reservations = () => {
                   <p className="text-sm">{reservation.special_requests}</p>
                 </div>
               )}
+
+              {reservation.payments && reservation.payments.length > 0 && (
+                <div className="mt-4 p-4 rounded-lg bg-success/5 border border-success/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CreditCard className="w-4 h-4 text-success" />
+                    <p className="font-semibold text-success">Ödeme Bilgileri</p>
+                  </div>
+                  {reservation.payments.map((payment: any) => (
+                    <div key={payment.id} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Yöntem:</span>
+                        <span className="font-medium capitalize">
+                          {payment.payment_method === "credit_card" ? "Kredi Kartı" :
+                           payment.payment_method === "cash" ? "Nakit" :
+                           payment.payment_method === "debit_card" ? "Banka Kartı" :
+                           payment.payment_method === "bank_transfer" ? "Banka Transferi" :
+                           "Diğer"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Tutar:</span>
+                        <span className="font-semibold text-success">${payment.amount}</span>
+                      </div>
+                      {payment.slip_code && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Slip Kodu:</span>
+                          <span className="font-mono text-sm">{payment.slip_code}</span>
+                        </div>
+                      )}
+                      {payment.notes && (
+                        <div className="mt-2 pt-2 border-t border-success/20">
+                          <p className="text-xs text-muted-foreground mb-1">Notlar:</p>
+                          <p className="text-sm">{payment.notes}</p>
+                        </div>
+                      )}
+                      <div className="text-xs text-muted-foreground">
+                        {format(new Date(payment.payment_date), "dd MMM yyyy HH:mm")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {(reservation.status === "confirmed" || reservation.status === "pending") && (
+                <div className="mt-4">
+                  <Button
+                    className="w-full"
+                    onClick={() => setCheckInReservation(reservation)}
+                  >
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Check-in Yap
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -141,6 +198,12 @@ const Reservations = () => {
       )}
 
       <ReservationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onSuccess={refetch} />
+      <CheckInDialog
+        open={!!checkInReservation}
+        onOpenChange={(open) => !open && setCheckInReservation(null)}
+        onSuccess={refetch}
+        reservation={checkInReservation}
+      />
     </div>
   );
 };

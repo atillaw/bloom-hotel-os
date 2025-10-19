@@ -7,14 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 interface RoomDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  editingRoom?: any;
 }
 
-export const RoomDialog = ({ open, onOpenChange, onSuccess }: RoomDialogProps) => {
+export const RoomDialog = ({ open, onOpenChange, onSuccess, editingRoom }: RoomDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     room_number: "",
@@ -27,6 +29,32 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess }: RoomDialogProps) =
     description: "",
   });
 
+  useEffect(() => {
+    if (editingRoom) {
+      setFormData({
+        room_number: editingRoom.room_number || "",
+        room_type: editingRoom.room_type || "single",
+        floor: editingRoom.floor?.toString() || "",
+        max_occupancy: editingRoom.max_occupancy?.toString() || "2",
+        rate_per_night: editingRoom.rate_per_night?.toString() || "",
+        amenities: editingRoom.amenities?.join(", ") || "",
+        status: editingRoom.status || "available",
+        description: editingRoom.description || "",
+      });
+    } else {
+      setFormData({
+        room_number: "",
+        room_type: "single",
+        floor: "",
+        max_occupancy: "2",
+        rate_per_night: "",
+        amenities: "",
+        status: "available",
+        description: "",
+      });
+    }
+  }, [editingRoom, open]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -37,7 +65,7 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess }: RoomDialogProps) =
         .map((a) => a.trim())
         .filter((a) => a.length > 0);
 
-      const { error } = await supabase.from("rooms").insert({
+      const roomData = {
         room_number: formData.room_number,
         room_type: formData.room_type as "single" | "double" | "suite" | "deluxe" | "presidential",
         floor: parseInt(formData.floor),
@@ -46,11 +74,18 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess }: RoomDialogProps) =
         amenities: amenitiesArray.length > 0 ? amenitiesArray : null,
         status: formData.status as "available" | "occupied" | "cleaning" | "maintenance" | "reserved",
         description: formData.description || null,
-      });
+      };
+
+      let error;
+      if (editingRoom) {
+        ({ error } = await supabase.from("rooms").update(roomData).eq("id", editingRoom.id));
+      } else {
+        ({ error } = await supabase.from("rooms").insert(roomData));
+      }
 
       if (error) throw error;
 
-      toast.success("Room added successfully!");
+      toast.success(editingRoom ? "Oda güncellendi!" : "Oda eklendi!");
       onSuccess();
       onOpenChange(false);
       setFormData({
@@ -64,7 +99,7 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess }: RoomDialogProps) =
         description: "",
       });
     } catch (error: any) {
-      toast.error(error.message || "Failed to add room");
+      toast.error(error.message || "Oda kaydedilemedi");
     } finally {
       setLoading(false);
     }
@@ -74,7 +109,7 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess }: RoomDialogProps) =
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Room</DialogTitle>
+          <DialogTitle>{editingRoom ? "Oda Düzenle" : "Yeni Oda Ekle"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -190,10 +225,10 @@ export const RoomDialog = ({ open, onOpenChange, onSuccess }: RoomDialogProps) =
 
           <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              İptal
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Room"}
+              {loading ? "Kaydediliyor..." : (editingRoom ? "Güncelle" : "Ekle")}
             </Button>
           </div>
         </form>

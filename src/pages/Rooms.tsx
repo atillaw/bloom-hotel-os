@@ -3,12 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, BedDouble, Users, DollarSign } from "lucide-react";
+import { Plus, BedDouble, Users, DollarSign, Edit } from "lucide-react";
 import { useState } from "react";
 import { RoomDialog } from "@/components/RoomDialog";
 
 const Rooms = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<any>(null);
 
   const { data: rooms, refetch } = useQuery({
     queryKey: ["rooms"],
@@ -104,6 +105,19 @@ const Rooms = () => {
                 </div>
               )}
             </CardContent>
+            <div className="px-6 pb-6">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  setEditingRoom(room);
+                  setIsDialogOpen(true);
+                }}
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Düzenle
+              </Button>
+            </div>
           </Card>
         ))}
       </div>
@@ -120,7 +134,18 @@ const Rooms = () => {
         </Card>
       )}
 
-      <RoomDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onSuccess={refetch} />
+      <RoomDialog 
+        open={isDialogOpen} 
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) setEditingRoom(null);
+        }} 
+        onSuccess={() => {
+          refetch();
+          setEditingRoom(null);
+        }}
+        editingRoom={editingRoom}
+      />
     </div>
   );
 };
