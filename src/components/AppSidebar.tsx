@@ -1,4 +1,4 @@
-import { LayoutDashboard, BedDouble, Users, Calendar, DollarSign, ClipboardList } from "lucide-react";
+import { LayoutDashboard, BedDouble, Users, Calendar, DollarSign, ClipboardList, Shield } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -10,17 +10,21 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Odalar", url: "/rooms", icon: BedDouble },
-  { title: "Misafirler", url: "/guests", icon: Users },
-  { title: "Rezervasyonlar", url: "/reservations", icon: Calendar },
-  { title: "Faturalama", url: "/billing", icon: DollarSign },
-  { title: "Kat Hizmetleri", url: "/housekeeping", icon: ClipboardList },
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, adminOnly: false },
+  { title: "Odalar", url: "/rooms", icon: BedDouble, adminOnly: false },
+  { title: "Misafirler", url: "/guests", icon: Users, adminOnly: false },
+  { title: "Rezervasyonlar", url: "/reservations", icon: Calendar, adminOnly: false },
+  { title: "Faturalama", url: "/billing", icon: DollarSign, adminOnly: false },
+  { title: "Kat Hizmetleri", url: "/housekeeping", icon: ClipboardList, adminOnly: false },
+  { title: "Admin Paneli", url: "/admin", icon: Shield, adminOnly: true },
 ];
 
 export function AppSidebar() {
+  const { isAdmin } = useAuth();
+  
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -28,7 +32,7 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-sidebar-primary font-semibold">Yönetim</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
+              {menuItems.filter(item => !item.adminOnly || isAdmin).map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
