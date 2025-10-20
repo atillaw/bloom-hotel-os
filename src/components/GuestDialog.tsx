@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,9 +11,10 @@ interface GuestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  editingGuest?: any;
 }
 
-export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps) => {
+export const GuestDialog = ({ open, onOpenChange, onSuccess, editingGuest }: GuestDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
@@ -26,12 +27,38 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
     loyalty_points: "0",
   });
 
+  useEffect(() => {
+    if (editingGuest) {
+      setFormData({
+        first_name: editingGuest.first_name || "",
+        last_name: editingGuest.last_name || "",
+        email: editingGuest.email || "",
+        phone: editingGuest.phone || "",
+        nationality: editingGuest.nationality || "",
+        id_number: editingGuest.id_number || "",
+        preferences: editingGuest.preferences || "",
+        loyalty_points: editingGuest.loyalty_points?.toString() || "0",
+      });
+    } else {
+      setFormData({
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone: "",
+        nationality: "",
+        id_number: "",
+        preferences: "",
+        loyalty_points: "0",
+      });
+    }
+  }, [editingGuest, open]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("guests").insert({
+      const guestData = {
         first_name: formData.first_name,
         last_name: formData.last_name,
         email: formData.email || null,
@@ -40,11 +67,18 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
         id_number: formData.id_number || null,
         preferences: formData.preferences || null,
         loyalty_points: parseInt(formData.loyalty_points) || 0,
-      });
+      };
+
+      let error;
+      if (editingGuest) {
+        ({ error } = await supabase.from("guests").update(guestData).eq("id", editingGuest.id));
+      } else {
+        ({ error } = await supabase.from("guests").insert(guestData));
+      }
 
       if (error) throw error;
 
-      toast.success("Misafir eklendi!");
+      toast.success(editingGuest ? "Misafir güncellendi!" : "Misafir eklendi!");
       onSuccess();
       onOpenChange(false);
       setFormData({
@@ -58,7 +92,7 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
         loyalty_points: "0",
       });
     } catch (error: any) {
-      toast.error(error.message || "Misafir eklenemedi");
+      toast.error(error.message || "Misafir kaydedilemedi");
     } finally {
       setLoading(false);
     }
@@ -68,7 +102,7 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Yeni Misafir Ekle</DialogTitle>
+          <DialogTitle>{editingGuest ? "Misafir Düzenle" : "Yeni Misafir Ekle"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -125,7 +159,7 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="id_number">Kimlik/Pasaport No</Label>
+              <Label htmlFor="id_number">TC Kimlik/Pasaport No</Label>
               <Input
                 id="id_number"
                 value={formData.id_number}
@@ -136,7 +170,7 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="loyalty_points">Başlangıç Sadakat Puanı</Label>
+            <Label htmlFor="loyalty_points">Sadakat Puanı</Label>
             <Input
               id="loyalty_points"
               type="number"
@@ -162,7 +196,7 @@ export const GuestDialog = ({ open, onOpenChange, onSuccess }: GuestDialogProps)
               İptal
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Ekleniyor..." : "Misafir Ekle"}
+              {loading ? "Kaydediliyor..." : (editingGuest ? "Güncelle" : "Kaydet")}
             </Button>
           </div>
         </form>
