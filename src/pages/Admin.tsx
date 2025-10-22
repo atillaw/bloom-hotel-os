@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { UserPlus, CheckCircle, XCircle, Clock } from "lucide-react";
-import { AddUserDialog } from "@/components/AddUserDialog";
+import { Key, CheckCircle, XCircle, Clock, ExternalLink, Copy } from "lucide-react";
+import { AccessKeyDialog } from "@/components/AccessKeyDialog";
+import { useNavigate } from "react-router-dom";
 
 export default function Admin() {
-  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
+  const [accessKeyDialogOpen, setAccessKeyDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const { data: accessRequests, refetch } = useQuery({
-    queryKey: ["access-requests"],
+  const { data: accessKeys, refetch } = useQuery({
+    queryKey: ["access-keys"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("access_requests")
+        .from("access_keys")
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -23,150 +25,138 @@ export default function Admin() {
     },
   });
 
-  const { data: userRoles } = useQuery({
-    queryKey: ["user-roles"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Panoya kopyalandı!");
+  };
 
-  const handleUpdateRequestStatus = async (id: string, status: string) => {
+  const handleDeleteKey = async (id: string) => {
+    if (!confirm("Bu erişim anahtarını silmek istediğinizden emin misiniz?")) return;
+    
     try {
       const { error } = await supabase
-        .from("access_requests")
-        .update({ status })
+        .from("access_keys")
+        .delete()
         .eq("id", id);
 
       if (error) throw error;
-      toast.success(`İstek ${status === "approved" ? "onaylandı" : "reddedildi"}`);
+      toast.success("Erişim anahtarı silindi");
       refetch();
     } catch (error: any) {
-      toast.error(error.message || "İşlem başarısız");
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending":
-        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Beklemede</Badge>;
-      case "approved":
-        return <Badge className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Onaylandı</Badge>;
-      case "rejected":
-        return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />Reddedildi</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
+      toast.error(error.message || "Silme işlemi başarısız");
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Admin Paneli</h1>
-        <Button onClick={() => setAddUserDialogOpen(true)}>
-          <UserPlus className="w-4 h-4 mr-2" />
-          Yeni Kullanıcı Ekle
-        </Button>
+        <h1 className="text-3xl font-bold">Admin Kontrol Paneli</h1>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => navigate("/landing")}>
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Ana Sayfa
+          </Button>
+          <Button onClick={() => setAccessKeyDialogOpen(true)}>
+            <Key className="w-4 h-4 mr-2" />
+            Yeni Erişim Anahtarı
+          </Button>
+        </div>
       </div>
 
-      {/* User Roles */}
+      {/* Access Keys Management */}
       <Card>
         <CardHeader>
-          <CardTitle>Sistemdeki Kullanıcılar ({userRoles?.length || 0})</CardTitle>
+          <CardTitle>Erişim Anahtarları ({accessKeys?.length || 0})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {userRoles?.map((role) => (
-              <div key={role.id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <p className="font-medium">User ID: {role.user_id}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Rol: <Badge variant={role.role === "admin" ? "default" : "secondary"}>
-                      {role.role === "admin" ? "Admin" : "Müşteri"}
-                    </Badge>
-                  </p>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {new Date(role.created_at).toLocaleDateString("tr-TR")}
-                </p>
-              </div>
-            ))}
-            {(!userRoles || userRoles.length === 0) && (
-              <p className="text-center text-muted-foreground py-8">Henüz kullanıcı yok</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Access Requests */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Erişim Talepleri ({accessRequests?.length || 0})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {accessRequests?.map((request) => (
-              <div key={request.id} className="border rounded-lg p-4 space-y-3">
+          <div className="space-y-3">
+            {accessKeys?.map((key) => (
+              <div key={key.id} className="border rounded-lg p-4 space-y-3">
                 <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-semibold">{request.full_name}</h3>
-                    <p className="text-sm text-muted-foreground">{request.email}</p>
-                    {request.phone && (
-                      <p className="text-sm text-muted-foreground">{request.phone}</p>
-                    )}
-                    {request.company_name && (
-                      <p className="text-sm font-medium">{request.company_name}</p>
-                    )}
-                  </div>
-                  {getStatusBadge(request.status)}
-                </div>
-
-                {request.message && (
-                  <p className="text-sm bg-muted p-3 rounded">{request.message}</p>
-                )}
-
-                <div className="flex items-center justify-between pt-2">
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(request.created_at).toLocaleString("tr-TR")}
-                  </p>
-                  {request.status === "pending" && (
-                    <div className="flex gap-2">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-3">
+                      <code className="text-lg font-mono font-bold bg-muted px-3 py-1 rounded">
+                        {key.access_key}
+                      </code>
                       <Button
                         size="sm"
-                        variant="outline"
-                        onClick={() => handleUpdateRequestStatus(request.id, "rejected")}
+                        variant="ghost"
+                        onClick={() => copyToClipboard(key.access_key)}
                       >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        Reddet
+                        <Copy className="w-4 h-4" />
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleUpdateRequestStatus(request.id, "approved")}
-                      >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        Onayla
-                      </Button>
+                      {key.is_used ? (
+                        <Badge variant="secondary">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Kullanıldı
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-green-500">
+                          <Clock className="w-3 h-3 mr-1" />
+                          Aktif
+                        </Badge>
+                      )}
                     </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Müşteri:</span>{" "}
+                        <span className="font-medium">{key.customer_name}</span>
+                      </div>
+                      {key.customer_email && (
+                        <div>
+                          <span className="text-muted-foreground">E-posta:</span>{" "}
+                          <span className="font-medium">{key.customer_email}</span>
+                        </div>
+                      )}
+                      {key.customer_phone && (
+                        <div>
+                          <span className="text-muted-foreground">Telefon:</span>{" "}
+                          <span className="font-medium">{key.customer_phone}</span>
+                        </div>
+                      )}
+                      {key.company_name && (
+                        <div>
+                          <span className="text-muted-foreground">Şirket:</span>{" "}
+                          <span className="font-medium">{key.company_name}</span>
+                        </div>
+                      )}
+                    </div>
+                    {key.notes && (
+                      <p className="text-sm bg-muted p-2 rounded">{key.notes}</p>
+                    )}
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span>Oluşturulma: {new Date(key.created_at).toLocaleString("tr-TR")}</span>
+                      {key.is_used && key.used_at && (
+                        <span>Kullanıldı: {new Date(key.used_at).toLocaleString("tr-TR")}</span>
+                      )}
+                    </div>
+                  </div>
+                  {!key.is_used && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDeleteKey(key.id)}
+                    >
+                      <XCircle className="w-4 h-4" />
+                    </Button>
                   )}
                 </div>
               </div>
             ))}
-            {(!accessRequests || accessRequests.length === 0) && (
-              <p className="text-center text-muted-foreground py-8">Henüz talep yok</p>
+            {(!accessKeys || accessKeys.length === 0) && (
+              <p className="text-center text-muted-foreground py-8">
+                Henüz erişim anahtarı oluşturulmadı
+              </p>
             )}
           </div>
         </CardContent>
       </Card>
 
-      <AddUserDialog 
-        open={addUserDialogOpen} 
-        onOpenChange={setAddUserDialogOpen}
+      <AccessKeyDialog 
+        open={accessKeyDialogOpen} 
+        onOpenChange={setAccessKeyDialogOpen}
         onSuccess={() => {
-          setAddUserDialogOpen(false);
+          setAccessKeyDialogOpen(false);
           refetch();
         }}
       />

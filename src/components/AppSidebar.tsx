@@ -13,7 +13,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard, adminOnly: false },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, adminOnly: false },
   { title: "Odalar", url: "/rooms", icon: BedDouble, adminOnly: false },
   { title: "Misafirler", url: "/guests", icon: Users, adminOnly: false },
   { title: "Rezervasyonlar", url: "/reservations", icon: Calendar, adminOnly: false },

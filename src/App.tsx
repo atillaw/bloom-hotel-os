@@ -13,6 +13,7 @@ import Housekeeping from "./pages/Housekeeping";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import Landing from "./pages/Landing";
+import SetupAdmin from "./pages/SetupAdmin";
 import NotFound from "./pages/NotFound";
 import { useAuth } from "./hooks/useAuth";
 
@@ -44,7 +45,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!isAdmin) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -57,10 +58,12 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Routes>
+          <Route path="/" element={<Landing />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/setup-admin" element={<SetupAdmin />} />
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/rooms" element={<Rooms />} />
             <Route path="/guests" element={<Guests />} />
             <Route path="/reservations" element={<Reservations />} />

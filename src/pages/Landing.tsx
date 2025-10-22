@@ -1,169 +1,134 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import { Hotel, Check } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Hotel, Key, Shield } from "lucide-react";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    full_name: "",
-    email: "",
-    phone: "",
-    company_name: "",
-    message: "",
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.from("access_requests").insert({
-        full_name: formData.full_name,
-        email: formData.email,
-        phone: formData.phone || null,
-        company_name: formData.company_name || null,
-        message: formData.message || null,
-        status: "pending",
-      });
-
-      if (error) throw error;
-
-      toast.success("İsteğiniz başarıyla gönderildi! En kısa sürede size dönüş yapacağız.");
-      setFormData({
-        full_name: "",
-        email: "",
-        phone: "",
-        company_name: "",
-        message: "",
-      });
-    } catch (error: any) {
-      toast.error(error.message || "İstek gönderilemedi");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
-      <header className="border-b bg-card shadow-sm">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-ocean">
-              <Hotel className="w-6 h-6 text-primary-foreground" />
+            <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center shadow-ocean">
+              <Hotel className="w-7 h-7 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">TŞDMR Hotel Management</h1>
-              <p className="text-xs text-muted-foreground">Bulut Tabanlı Otel Yönetim Sistemi</p>
+              <h1 className="text-xl font-bold">TŞDMR</h1>
+              <p className="text-xs text-muted-foreground">Hotel Management System</p>
             </div>
           </div>
-          <Button onClick={() => navigate("/auth")}>Giriş Yap</Button>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => navigate("/auth")}>
+              <Key className="w-4 h-4 mr-2" />
+              Giriş Yap
+            </Button>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-4xl font-bold mb-4">
-              Otel İşletmenizi Dijitalleştirin
-            </h2>
-            <p className="text-lg text-muted-foreground mb-6">
-              TŞDMR Hotel Management ile rezervasyonlarınızı, misafirlerinizi, odalarınızı ve 
-              faturalamalarınızı tek bir platformdan yönetin.
-            </p>
-            <ul className="space-y-3 mb-8">
-              {[
-                "Rezervasyon Yönetimi",
-                "Misafir Takibi",
-                "Oda Yönetimi",
-                "Faturalama ve Ödeme Takibi",
-                "Kat Hizmetleri Koordinasyonu",
-                "KBS Entegrasyonu",
-              ].map((feature) => (
-                <li key={feature} className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-primary" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
+      <section className="container mx-auto px-4 py-20 text-center">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <h2 className="text-4xl md:text-5xl font-bold">
+            Profesyonel Otel Yönetim Sistemi
+          </h2>
+          <p className="text-xl text-muted-foreground">
+            TŞDMR Hotel Management ile otellerin rezervasyon, misafir yönetimi, oda takibi ve 
+            faturalama süreçlerini tek bir platformdan yönetin. Güvenli, hızlı ve kullanıcı dostu arayüz.
+          </p>
+          <div className="flex gap-4 justify-center pt-6">
+            <Button size="lg" onClick={() => navigate("/auth")}>
+              <Key className="w-5 h-5 mr-2" />
+              Erişim Anahtarı ile Giriş
+            </Button>
           </div>
+        </div>
+      </section>
 
-          {/* Request Access Form */}
+      {/* Features */}
+      <section className="container mx-auto px-4 py-12">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle>Erişim Talebi</CardTitle>
-              <CardDescription>
-                Sistemi kullanmaya başlamak için aşağıdaki formu doldurun
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Hotel className="w-5 h-5" />
+                Oda Yönetimi
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="full_name">Ad Soyad *</Label>
-                  <Input
-                    id="full_name"
-                    required
-                    value={formData.full_name}
-                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    placeholder="Adınız ve soyadınız"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-posta *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="ornek@email.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefon</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+90 5XX XXX XX XX"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="company_name">Şirket/Otel Adı</Label>
-                  <Input
-                    id="company_name"
-                    value={formData.company_name}
-                    onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-                    placeholder="Şirket veya otel adınız"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="message">Mesaj</Label>
-                  <Textarea
-                    id="message"
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="İsteğiniz veya sorularınız..."
-                    rows={4}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Gönderiliyor..." : "Erişim Talebi Gönder"}
-                </Button>
-              </form>
+              <p className="text-muted-foreground">
+                Tüm odaların durumunu gerçek zamanlı takip edin, oda tiplerini yönetin ve 
+                müsaitlik durumunu anlık olarak kontrol edin.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Key className="w-5 h-5" />
+                Güvenli Erişim
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Erişim anahtarı sistemi ile sadece yetkili kullanıcıların platforma erişimini sağlayın.
+                Her kullanıcı için özel anahtar oluşturabilirsiniz.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Tam Kontrol
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Rezervasyonlar, misafirler, faturalama ve kat hizmetlerini tek bir yerden yönetin.
+                Detaylı raporlama ve analiz özellikleri.
+              </p>
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      {/* Info Section */}
+      <section className="container mx-auto px-4 py-12">
+        <Card className="max-w-3xl mx-auto text-center">
+          <CardHeader>
+            <CardTitle className="text-2xl">Nasıl Çalışır?</CardTitle>
+            <CardDescription className="text-base">
+              TŞDMR Hotel Management sistemine erişim için admin tarafından size bir erişim anahtarı verilecektir.
+              Bu anahtar ile sisteme giriş yapabilir ve otel yönetimi süreçlerinizi dijital ortamda yönetebilirsiniz.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div className="p-4 border rounded-lg">
+                <div className="font-semibold mb-2">1. Erişim Anahtarı Alın</div>
+                <p className="text-muted-foreground">Admin size özel bir erişim anahtarı oluşturacak</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <div className="font-semibold mb-2">2. Sisteme Giriş Yapın</div>
+                <p className="text-muted-foreground">Anahtarınızı kullanarak platforma erişin</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <div className="font-semibold mb-2">3. Yönetmeye Başlayın</div>
+                <p className="text-muted-foreground">Tüm otel süreçlerinizi dijital ortamda yönetin</p>
+              </div>
+            </div>
+            <Button size="lg" onClick={() => navigate("/auth")} className="mt-6">
+              <Key className="w-5 h-5 mr-2" />
+              Erişim Anahtarı ile Giriş Yap
+            </Button>
+          </CardContent>
+        </Card>
       </section>
     </div>
   );
