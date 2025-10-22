@@ -7,11 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Key, CheckCircle, XCircle, Clock, ExternalLink, Copy } from "lucide-react";
 import { AccessKeyDialog } from "@/components/AccessKeyDialog";
-import { useNavigate } from "react-router-dom";
+
 
 export default function Admin() {
   const [accessKeyDialogOpen, setAccessKeyDialogOpen] = useState(false);
-  const navigate = useNavigate();
 
   const { data: accessKeys, refetch } = useQuery({
     queryKey: ["access-keys"],
@@ -50,17 +49,14 @@ export default function Admin() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Admin Kontrol Paneli</h1>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => navigate("/landing")}>
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Ana Sayfa
-          </Button>
-          <Button onClick={() => setAccessKeyDialogOpen(true)}>
-            <Key className="w-4 h-4 mr-2" />
-            Yeni Erişim Anahtarı
-          </Button>
+        <div>
+          <h1 className="text-3xl font-bold">Admin Kontrol Paneli</h1>
+          <p className="text-muted-foreground mt-1">Erişim anahtarlarını yönetin ve sistem üzerinde tam kontrol sağlayın</p>
         </div>
+        <Button onClick={() => setAccessKeyDialogOpen(true)} size="lg">
+          <Key className="w-4 h-4 mr-2" />
+          Yeni Erişim Anahtarı
+        </Button>
       </div>
 
       {/* Access Keys Management */}

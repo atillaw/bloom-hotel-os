@@ -1,13 +1,13 @@
-import { Outlet } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
-import { Hotel, LogOut } from "lucide-react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AdminSidebar } from "./AdminSidebar";
+import { CustomerSidebar } from "./CustomerSidebar";
 import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 
 export const Layout = () => {
-  const { signOut } = useAuth();
+  const { signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -18,27 +18,27 @@ export const Layout = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-16 border-b bg-card flex items-center justify-between px-6 shadow-sm">
+        {isAdmin ? <AdminSidebar /> : <CustomerSidebar />}
+        <main className="flex-1 flex flex-col">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-6">
+            <SidebarTrigger />
+            <div className="flex-1" />
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-ocean">
-                <Hotel className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold">TŞDMR Hotel Management</h1>
-                <p className="text-xs text-muted-foreground">Cloud-Based Property Management System</p>
-              </div>
+              {isAdmin && (
+                <Button variant="outline" size="sm" onClick={() => navigate("/landing")}>
+                  Ana Sayfa
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Çıkış Yap
+              </Button>
             </div>
-            <Button variant="ghost" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Çıkış Yap
-            </Button>
           </header>
-          <main className="flex-1 p-6 bg-gradient-subtle overflow-auto">
+          <div className="flex-1 p-6 bg-gradient-subtle overflow-auto">
             <Outlet />
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </SidebarProvider>
   );
