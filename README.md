@@ -1,73 +1,51 @@
-# Welcome to your Lovable project
+# Bloom Hotel OS – Django + React Setup
 
-## Project info
+This repository now bundles the existing Vite/React front-end with a lightweight Django
+project so you can run the hotel management experience locally with a Python backend.
 
-**URL**: https://lovable.dev/projects/6774557e-1c0b-4bd9-a735-a484f984aeec
+## Prerequisites
 
-## How can I edit this code?
+- Node.js 18+
+- Python 3.11+
+- A virtual environment tool of your choice (`venv`, `conda`, etc.)
 
-There are several ways of editing your application.
+## 1. Install front-end dependencies and build the React app
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/6774557e-1c0b-4bd9-a735-a484f984aeec) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+npm install
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+The build step produces hashed assets inside `dist/` that Django will serve.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 2. Create a Python virtual environment and install Django
 
-**Use GitHub Codespaces**
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 3. Apply database migrations (SQLite by default)
 
-## What technologies are used for this project?
+```bash
+python backend/manage.py migrate
+```
 
-This project is built with:
+## 4. Run the Django development server
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+python backend/manage.py runserver
+```
 
-## How can I deploy this project?
+Visit <http://127.0.0.1:8000> to browse the compiled React single-page application
+served by Django. Any unknown route is routed back to the SPA so client-side
+navigation continues to work.
 
-Simply open [Lovable](https://lovable.dev/projects/6774557e-1c0b-4bd9-a735-a484f984aeec) and click on Share -> Publish.
+## Development tips
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Whenever you update the React code, re-run `npm run build` so the Django server
+  serves the latest assets.
+- Static files are exposed from `dist/assets/` via Django’s static files system.
+- You can enable Django debug mode by exporting `DJANGO_DEBUG=false` for production-like
+  behaviour or tweaking other settings via environment variables.
