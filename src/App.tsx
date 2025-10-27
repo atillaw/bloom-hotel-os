@@ -13,7 +13,6 @@ import Housekeeping from "./pages/Housekeeping";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
 import Landing from "./pages/Landing";
-import SetupAdmin from "./pages/SetupAdmin";
 import NotFound from "./pages/NotFound";
 import { useAuth } from "./hooks/useAuth";
 
@@ -61,7 +60,6 @@ const App = () => (
           <Route path="/" element={<Landing />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/setup-admin" element={<SetupAdmin />} />
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/rooms" element={<Rooms />} />
